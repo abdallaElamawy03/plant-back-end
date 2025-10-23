@@ -1,268 +1,269 @@
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Plant Backend API',
-      version: '1.0.0',
-      description: 'API documentation for Plant Backend application with authentication and user management',
+      title: "Plant Backend API",
+      version: "1.0.0",
+      description:
+        "API documentation for Plant Backend application with authentication and user management",
       contact: {
-        name: 'API Support',
-        email: 'support@plantbackend.com',
+        name: "API Support",
+        email: "support@plantbackend.com",
       },
     },
     servers: [
       {
-        url: 'http://localhost:3500',
-        description: 'Development server',
+        url: "http://localhost:3500",
+        description: "Development server",
       },
       {
-        url: 'https://api.production.com',
-        description: 'Production server',
+        url: "https://api.production.com",
+        description: "Production server",
       },
     ],
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'Enter your JWT token',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Enter your JWT token",
         },
         cookieAuth: {
-          type: 'apiKey',
-          in: 'cookie',
-          name: 'jwt',
-          description: 'JWT token stored in cookie',
+          type: "apiKey",
+          in: "cookie",
+          name: "jwt",
+          description: "JWT token stored in cookie",
         },
       },
       schemas: {
         User: {
-          type: 'object',
-          required: ['username', 'password'],
+          type: "object",
+          required: ["username", "password"],
           properties: {
             _id: {
-              type: 'string',
-              description: 'Auto-generated user ID',
-              example: '507f1f77bcf86cd799439011',
+              type: "string",
+              description: "Auto-generated user ID",
+              example: "507f1f77bcf86cd799439011",
             },
             username: {
-              type: 'string',
-              description: 'Unique username',
-              example: 'john_doe',
+              type: "string",
+              description: "Unique username",
+              example: "john_doe",
             },
             password: {
-              type: 'string',
-              format: 'password',
-              description: 'Hashed password',
-              example: 'SecurePass123!',
+              type: "string",
+              format: "password",
+              description: "Hashed password",
+              example: "SecurePass123!",
             },
             roles: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'string',
-                enum: ['user', 'admin', 'manager'],
+                type: "string",
+                enum: ["user", "admin", "manager"],
               },
-              default: ['user'],
-              description: 'User roles',
-              example: ['user'],
+              default: ["user"],
+              description: "User roles",
+              example: ["user"],
             },
             active: {
-              type: 'boolean',
+              type: "boolean",
               default: true,
-              description: 'User account status',
+              description: "User account status",
               example: true,
             },
           },
         },
         UserResponse: {
-          type: 'object',
+          type: "object",
           properties: {
             _id: {
-              type: 'string',
-              example: '507f1f77bcf86cd799439011',
+              type: "string",
+              example: "507f1f77bcf86cd799439011",
             },
             username: {
-              type: 'string',
-              example: 'john_doe',
+              type: "string",
+              example: "john_doe",
             },
             roles: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'string',
+                type: "string",
               },
-              example: ['user'],
+              example: ["user"],
             },
             active: {
-              type: 'boolean',
+              type: "boolean",
               example: true,
             },
           },
         },
         LoginRequest: {
-          type: 'object',
-          required: ['username', 'password'],
+          type: "object",
+          required: ["username", "password"],
           properties: {
             username: {
-              type: 'string',
-              example: 'john_doe',
+              type: "string",
+              example: "john_doe",
             },
             password: {
-              type: 'string',
-              format: 'password',
-              example: 'SecurePass123!',
+              type: "string",
+              format: "password",
+              example: "SecurePass123!",
             },
           },
         },
         LoginResponse: {
-          type: 'object',
+          type: "object",
           properties: {
             accessToken: {
-              type: 'string',
-              description: 'JWT access token',
-              example: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+              type: "string",
+              description: "JWT access token",
+              example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
             },
             roles: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'string',
+                type: "string",
               },
-              example: ['user'],
+              example: ["user"],
             },
           },
         },
         CreateUserRequest: {
-          type: 'object',
-          required: ['username', 'password'],
+          type: "object",
+          required: ["username", "password"],
           properties: {
             username: {
-              type: 'string',
-              example: 'jane_doe',
+              type: "string",
+              example: "jane_doe",
             },
             password: {
-              type: 'string',
-              format: 'password',
-              example: 'SecurePass123!',
+              type: "string",
+              format: "password",
+              example: "SecurePass123!",
             },
             roles: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'string',
-                enum: ['user', 'admin', 'manager'],
+                type: "string",
+                enum: ["user", "admin", "manager"],
               },
-              example: ['user'],
+              example: ["user"],
             },
           },
         },
         UpdateUserRequest: {
-          type: 'object',
-          required: ['username'],
+          type: "object",
+          required: ["username"],
           properties: {
             username: {
-              type: 'string',
-              example: 'john_updated',
+              type: "string",
+              example: "john_updated",
             },
             password: {
-              type: 'string',
-              format: 'password',
-              description: 'Optional - only if changing password',
-              example: 'NewSecurePass123!',
+              type: "string",
+              format: "password",
+              description: "Optional - only if changing password",
+              example: "NewSecurePass123!",
             },
             roles: {
-              type: 'array',
+              type: "array",
               items: {
-                type: 'string',
+                type: "string",
               },
-              example: ['user', 'admin'],
+              example: ["user", "admin"],
             },
             active: {
-              type: 'boolean',
+              type: "boolean",
               example: true,
             },
           },
         },
         DeleteUserRequest: {
-          type: 'object',
-          required: ['id'],
+          type: "object",
+          required: ["id"],
           properties: {
             id: {
-              type: 'string',
-              description: 'User ID to delete',
-              example: '507f1f77bcf86cd799439011',
+              type: "string",
+              description: "User ID to delete",
+              example: "507f1f77bcf86cd799439011",
             },
           },
         },
         Error: {
-          type: 'object',
+          type: "object",
           properties: {
             message: {
-              type: 'string',
-              description: 'Error message',
-              example: 'An error occurred',
+              type: "string",
+              description: "Error message",
+              example: "An error occurred",
             },
           },
         },
         SuccessMessage: {
-          type: 'object',
+          type: "object",
           properties: {
             message: {
-              type: 'string',
-              example: 'Operation successful',
+              type: "string",
+              example: "Operation successful",
             },
           },
         },
       },
       responses: {
         UnauthorizedError: {
-          description: 'Access token is missing or invalid',
+          description: "Access token is missing or invalid",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                $ref: '#/components/schemas/Error',
+                $ref: "#/components/schemas/Error",
               },
               example: {
-                message: 'Unauthorized',
+                message: "Unauthorized",
               },
             },
           },
         },
         ForbiddenError: {
-          description: 'Access forbidden - insufficient permissions',
+          description: "Access forbidden - insufficient permissions",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                $ref: '#/components/schemas/Error',
+                $ref: "#/components/schemas/Error",
               },
               example: {
-                message: 'Forbidden',
+                message: "Forbidden",
               },
             },
           },
         },
         NotFoundError: {
-          description: 'Resource not found',
+          description: "Resource not found",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                $ref: '#/components/schemas/Error',
+                $ref: "#/components/schemas/Error",
               },
               example: {
-                message: 'Not found',
+                message: "Not found",
               },
             },
           },
         },
         BadRequestError: {
-          description: 'Bad request - invalid input',
+          description: "Bad request - invalid input",
           content: {
-            'application/json': {
+            "application/json": {
               schema: {
-                $ref: '#/components/schemas/Error',
+                $ref: "#/components/schemas/Error",
               },
               example: {
-                message: 'All fields are required',
+                message: "All fields are required",
               },
             },
           },
@@ -271,20 +272,16 @@ const options = {
     },
     tags: [
       {
-        name: 'Authentication',
-        description: 'Authentication and authorization endpoints',
+        name: "Authentication",
+        description: "Authentication and authorization endpoints",
       },
       {
-        name: 'Users',
-        description: 'User management endpoints',
+        name: "Users",
+        description: "User management endpoints",
       },
     ],
   },
-  apis: [
-    './routes/*.js',
-    './controllers/*.js',
-    './models/*.js',
-  ], // Auto-scan all route files for JSDoc annotations
+  apis: ["./routes/*.js", "./controllers/*.js", "./models/*.js"], // Auto-scan all route files for JSDoc annotations
 };
 
 const swaggerSpec = swaggerJsdoc(options);

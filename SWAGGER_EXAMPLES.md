@@ -20,25 +20,25 @@ npm start
 ### 1. Basic Swagger Configuration (config/swagger.js)
 
 ```javascript
-const swaggerJsdoc = require('swagger-jsdoc');
-const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require("swagger-jsdoc");
+const swaggerUi = require("swagger-ui-express");
 
 const options = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Your API Name',
-      version: '1.0.0',
-      description: 'API Description',
+      title: "Your API Name",
+      version: "1.0.0",
+      description: "API Description",
     },
     servers: [
       {
-        url: 'http://localhost:3500',
-        description: 'Development server',
+        url: "http://localhost:3500",
+        description: "Development server",
       },
     ],
   },
-  apis: ['./routes/*.js'], // Path to API docs
+  apis: ["./routes/*.js"], // Path to API docs
 };
 
 const swaggerSpec = swaggerJsdoc(options);
@@ -57,6 +57,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 ### 3. Route Documentation Examples
 
 #### GET Endpoint (No Auth)
+
 ```javascript
 /**
  * @swagger
@@ -74,10 +75,11 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *               items:
  *                 type: object
  */
-router.get('/items', controller.getItems);
+router.get("/items", controller.getItems);
 ```
 
 #### POST Endpoint (With Request Body)
+
 ```javascript
 /**
  * @swagger
@@ -110,10 +112,11 @@ router.get('/items', controller.getItems);
  *       400:
  *         description: Bad Request
  */
-router.post('/items', controller.createItem);
+router.post("/items", controller.createItem);
 ```
 
 #### GET with Path Parameters
+
 ```javascript
 /**
  * @swagger
@@ -134,10 +137,11 @@ router.post('/items', controller.createItem);
  *       404:
  *         description: Not Found
  */
-router.get('/items/:id', controller.getItemById);
+router.get("/items/:id", controller.getItemById);
 ```
 
 #### Protected Endpoint (JWT Auth)
+
 ```javascript
 /**
  * @swagger
@@ -155,10 +159,11 @@ router.get('/items/:id', controller.getItemById);
  *       403:
  *         description: Forbidden
  */
-router.get('/admin/users', verifyAdmin, controller.getUsers);
+router.get("/admin/users", verifyAdmin, controller.getUsers);
 ```
 
 #### PATCH/PUT with Multiple Responses
+
 ```javascript
 /**
  * @swagger
@@ -192,10 +197,11 @@ router.get('/admin/users', verifyAdmin, controller.getUsers);
  *       409:
  *         description: Conflict
  */
-router.patch('/items/:id', controller.updateItem);
+router.patch("/items/:id", controller.updateItem);
 ```
 
 #### DELETE Endpoint
+
 ```javascript
 /**
  * @swagger
@@ -217,7 +223,7 @@ router.patch('/items/:id', controller.updateItem);
  *       404:
  *         description: Not found
  */
-router.delete('/items/:id', verifyJwt, controller.deleteItem);
+router.delete("/items/:id", verifyJwt, controller.deleteItem);
 ```
 
 ### 4. Defining Reusable Schemas
@@ -343,7 +349,7 @@ components: {
  *       200:
  *         description: Success
  */
-router.get('/items', controller.searchItems);
+router.get("/items", controller.searchItems);
 ```
 
 ### 7. File Upload Endpoint
@@ -371,7 +377,7 @@ router.get('/items', controller.searchItems);
  *       200:
  *         description: File uploaded
  */
-router.post('/upload', upload.single('file'), controller.uploadFile);
+router.post("/upload", upload.single("file"), controller.uploadFile);
 ```
 
 ### 8. Array Response
@@ -455,6 +461,7 @@ router.post('/upload', upload.single('file'), controller.uploadFile);
 ## Common Patterns for Your Project
 
 ### Pattern 1: Protected Admin Endpoint
+
 ```javascript
 /**
  * @swagger
@@ -479,10 +486,11 @@ router.post('/upload', upload.single('file'), controller.uploadFile);
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
+router.get("/admin/stats", verifyjwt, checkAdmin, controller.getStats);
 ```
 
 ### Pattern 2: Login with Cookie Response
+
 ```javascript
 /**
  * @swagger
@@ -512,6 +520,7 @@ router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
 ```
 
 ### Pattern 3: Pagination Response
+
 ```javascript
 /**
  * @swagger
@@ -543,6 +552,7 @@ router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
 ## Testing with Swagger UI
 
 ### Step 1: Authentication
+
 ```
 1. Go to /api-docs
 2. Click POST /auth (login)
@@ -557,6 +567,7 @@ router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
 ```
 
 ### Step 2: Authorize
+
 ```
 1. Click the green "Authorize" button (top right)
 2. Enter: Bearer <your-access-token>
@@ -565,6 +576,7 @@ router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
 ```
 
 ### Step 3: Test Protected Endpoint
+
 ```
 1. Click GET /users
 2. Click "Try it out"
@@ -577,15 +589,19 @@ router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
 ## Troubleshooting
 
 ### Issue: Endpoints not showing
+
 **Solution**: Ensure JSDoc has `@swagger` tag and file is in apis array
 
 ### Issue: Schema not found
+
 **Solution**: Check $ref path: `#/components/schemas/SchemaName`
 
 ### Issue: Authentication not working
+
 **Solution**: Use format `Bearer <token>` (with space)
 
 ### Issue: Changes not appearing
+
 **Solution**: Restart server after modifying swagger.js
 
 ---
@@ -593,58 +609,69 @@ router.get('/admin/stats', verifyjwt, checkAdmin, controller.getStats);
 ## Advanced Features
 
 ### Custom Swagger UI Options
+
 ```javascript
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "My API Docs",
-  customfavIcon: "/favicon.ico",
-  swaggerOptions: {
-    persistAuthorization: true,
-    displayRequestDuration: true,
-  },
-}));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "My API Docs",
+    customfavIcon: "/favicon.ico",
+    swaggerOptions: {
+      persistAuthorization: true,
+      displayRequestDuration: true,
+    },
+  })
+);
 ```
 
 ### Export Swagger JSON
+
 ```javascript
 // Add this route to export raw spec
-app.get('/api-docs.json', (req, res) => {
-  res.setHeader('Content-Type', 'application/json');
+app.get("/api-docs.json", (req, res) => {
+  res.setHeader("Content-Type", "application/json");
   res.send(swaggerSpec);
 });
 ```
 
 ### Multiple API Versions
+
 ```javascript
 const v1Spec = swaggerJsdoc({
-  definition: { /* v1 config */ },
-  apis: ['./routes/v1/*.js'],
+  definition: {
+    /* v1 config */
+  },
+  apis: ["./routes/v1/*.js"],
 });
 
 const v2Spec = swaggerJsdoc({
-  definition: { /* v2 config */ },
-  apis: ['./routes/v2/*.js'],
+  definition: {
+    /* v2 config */
+  },
+  apis: ["./routes/v2/*.js"],
 });
 
-app.use('/api/v1/docs', swaggerUi.serve, swaggerUi.setup(v1Spec));
-app.use('/api/v2/docs', swaggerUi.serve, swaggerUi.setup(v2Spec));
+app.use("/api/v1/docs", swaggerUi.serve, swaggerUi.setup(v1Spec));
+app.use("/api/v2/docs", swaggerUi.serve, swaggerUi.setup(v2Spec));
 ```
 
 ---
 
 ## Your Project Endpoints Summary
 
-| Method | Endpoint | Description | Auth Required |
-|--------|----------|-------------|---------------|
-| POST | /auth | Login | No |
-| GET | /auth/refresh | Refresh token | Cookie |
-| POST | /auth/logout | Logout | Cookie |
-| GET | /users | Get all users | Yes (Admin) |
-| POST | /users | Create user | No |
-| DELETE | /users | Delete user | Yes |
-| GET | /users/:id | Get user by ID | No |
-| PATCH | /users/:id | Update user | No |
+| Method | Endpoint      | Description    | Auth Required |
+| ------ | ------------- | -------------- | ------------- |
+| POST   | /auth         | Login          | No            |
+| GET    | /auth/refresh | Refresh token  | Cookie        |
+| POST   | /auth/logout  | Logout         | Cookie        |
+| GET    | /users        | Get all users  | Yes (Admin)   |
+| POST   | /users        | Create user    | No            |
+| DELETE | /users        | Delete user    | Yes           |
+| GET    | /users/:id    | Get user by ID | No            |
+| PATCH  | /users/:id    | Update user    | No            |
 
 All documented at: **http://localhost:3500/api-docs**
 
@@ -653,7 +680,7 @@ All documented at: **http://localhost:3500/api-docs**
 ## Next Steps
 
 1. ✅ Add more route files? Add them to `apis` array in swagger.js
-2. ✅ Need more schemas? Add to `components.schemas` 
+2. ✅ Need more schemas? Add to `components.schemas`
 3. ✅ Custom responses? Add to `components.responses`
 4. ✅ Deploy? Update server URLs in swagger.js
 5. ✅ Export docs? Access `/api-docs.json` for raw OpenAPI spec

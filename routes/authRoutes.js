@@ -1,7 +1,7 @@
-const express = require("express")
-const router = express.Router()
-const authController = require("../controllers/authController")
-const loginLimiter = require("../middleware/loginLimiter")
+const express = require("express");
+const router = express.Router();
+const authController = require("../controllers/authController");
+const loginLimiter = require("../middleware/loginLimiter");
 
 /**
  * @swagger
@@ -39,8 +39,7 @@ const loginLimiter = require("../middleware/loginLimiter")
  *             schema:
  *               $ref: '#/components/schemas/Error'
  */
-router.route('/')
-.post(loginLimiter, authController.login)
+router.route("/").post(loginLimiter, authController.login);
 
 /**
  * @swagger
@@ -63,8 +62,7 @@ router.route('/')
  *       403:
  *         $ref: '#/components/responses/ForbiddenError'
  */
-router.route('/refresh')
-.get(authController.refresh)
+router.route("/refresh").get(authController.refresh);
 
 /**
  * @swagger
@@ -87,7 +85,6 @@ router.route('/refresh')
  *       204:
  *         description: No content - cookie already cleared
  */
-router.route('/logout')
-.post(authController.logout)
+router.route("/logout").post(authController.logout);
 
-module.exports=router
+module.exports = router;

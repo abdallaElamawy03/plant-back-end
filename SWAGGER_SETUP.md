@@ -1,16 +1,19 @@
 # Swagger API Documentation Setup
 
 ## Overview
+
 This document explains the Swagger (OpenAPI 3.0) implementation for the Plant Backend API.
 
 ## Installation
 
 The following packages have been installed:
+
 ```bash
 npm install swagger-jsdoc swagger-ui-express --save
 ```
 
 ### Dependencies
+
 - **swagger-jsdoc**: Generates Swagger/OpenAPI specification from JSDoc comments
 - **swagger-ui-express**: Serves auto-generated Swagger UI
 
@@ -31,6 +34,7 @@ plant-back-end/
 ### 1. Swagger Config (`config/swagger.js`)
 
 This file contains:
+
 - OpenAPI 3.0 specification
 - API metadata (title, version, description)
 - Server configurations (development & production)
@@ -40,6 +44,7 @@ This file contains:
 - Tags for grouping endpoints
 
 **Key Features:**
+
 - Auto-scans `./routes/*.js`, `./controllers/*.js`, and `./models/*.js` for JSDoc annotations
 - Defines reusable components for DRY documentation
 - Includes security schemes for JWT authentication
@@ -47,14 +52,19 @@ This file contains:
 ### 2. Server Integration (`server.js`)
 
 Swagger UI is served at `/api-docs`:
+
 ```javascript
 const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "Plant Backend API Documentation",
-}));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Plant Backend API Documentation",
+  })
+);
 ```
 
 ## Accessing Swagger UI
@@ -62,6 +72,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
 Once the server is running:
 
 1. Start your server:
+
    ```bash
    npm start
    # or
@@ -69,6 +80,7 @@ Once the server is running:
    ```
 
 2. Open your browser and navigate to:
+
    ```
    http://localhost:3500/api-docs
    ```
@@ -80,43 +92,51 @@ Once the server is running:
 ### Authentication Endpoints
 
 #### POST /auth
+
 - **Summary**: User login
 - **Request Body**: `{ username, password }`
 - **Response**: Access token (JSON) + Refresh token (cookie)
 - **Rate Limited**: Yes (via loginLimiter)
 
 #### GET /auth/refresh
+
 - **Summary**: Refresh access token
 - **Security**: Requires refresh token in cookie
 - **Response**: New access token
 
 #### POST /auth/logout
+
 - **Summary**: User logout
 - **Response**: Clears JWT cookie
 
 ### User Management Endpoints
 
 #### GET /users
+
 - **Summary**: Get all users
 - **Security**: Bearer JWT (Admin only)
 - **Response**: Array of user objects
 
 #### POST /users
+
 - **Summary**: Create new user
 - **Request Body**: `{ username, password, roles? }`
 - **Response**: Access token (JSON) + Refresh token (cookie)
 
 #### DELETE /users
+
 - **Summary**: Delete user
 - **Security**: Bearer JWT (Admin or self)
 - **Request Body**: `{ id }`
 
 #### GET /users/:id
+
 - **Summary**: Get user by ID
 - **Parameters**: User ID in path
 - **Response**: User object
 
 #### PATCH /users/:id
+
 - **Summary**: Update user
 - **Parameters**: User ID in path
 - **Request Body**: `{ username, password?, roles?, active? }`
@@ -165,6 +185,7 @@ Swagger documentation is written using JSDoc comments in route files:
 Defined in `config/swagger.js`:
 
 **Schemas:**
+
 - `User`: Full user model
 - `UserResponse`: User without password
 - `LoginRequest`: Login credentials
@@ -176,10 +197,12 @@ Defined in `config/swagger.js`:
 - `SuccessMessage`: Success message response
 
 **Security Schemes:**
+
 - `bearerAuth`: JWT token in Authorization header
 - `cookieAuth`: JWT token in cookie
 
 **Common Responses:**
+
 - `UnauthorizedError`: 401 responses
 - `ForbiddenError`: 403 responses
 - `NotFoundError`: 404 responses
@@ -198,11 +221,13 @@ Defined in `config/swagger.js`:
 ### Authentication Flow
 
 1. **Register/Login**:
+
    - Use `POST /users` to create account OR
    - Use `POST /auth` to login
    - Copy the `accessToken` from response
 
 2. **Authorize**:
+
    - Click the green "Authorize" button at top right
    - Enter: `Bearer <your-access-token>`
    - Click "Authorize"
@@ -229,7 +254,7 @@ Defined in `config/swagger.js`:
  *       200:
  *         description: Success
  */
-router.get('/your-endpoint', controller.handler);
+router.get("/your-endpoint", controller.handler);
 ```
 
 3. Swagger UI auto-updates (restart server if needed)
@@ -284,16 +309,19 @@ servers: [
 ## Troubleshooting
 
 ### Swagger UI Not Loading
+
 - Check server is running on correct port
 - Verify `/api-docs` route is accessible
 - Check browser console for errors
 
 ### Endpoints Not Appearing
+
 - Ensure JSDoc comments have `@swagger` tag
 - Verify file paths in `swagger.js` apis array
 - Restart server after adding new annotations
 
 ### Authentication Not Working
+
 - Ensure you're using `Bearer <token>` format
 - Check token hasn't expired (30min default)
 - Verify token in browser cookies (for refresh token)

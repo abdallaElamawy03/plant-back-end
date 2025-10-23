@@ -22,11 +22,15 @@ app.use(cors(corsOptions));
 console.log(process.env.NODE_ENV);
 
 // Swagger API Documentation
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, {
-  explorer: true,
-  customCss: '.swagger-ui .topbar { display: none }',
-  customSiteTitle: "Plant Backend API Documentation",
-}));
+app.use(
+  "/api-docs",
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, {
+    explorer: true,
+    customCss: ".swagger-ui .topbar { display: none }",
+    customSiteTitle: "Plant Backend API Documentation",
+  })
+);
 
 app.use("/", require("./routes/root"));
 app.use("/auth", require("./routes/authRoutes"));
