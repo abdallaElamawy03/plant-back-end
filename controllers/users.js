@@ -1,25 +1,44 @@
 const User = require('../models/User')
 const asyncHandler = require('express-async-handler')// keep us from using try and catch alot 
 const jwt = require("jsonwebtoken")
+const Post = require('../models/posts')
 
 const bcrypt = require('bcrypt')
 //@desc get all users 
 //@route get/users
 //@access Private
-const getallUsers =asyncHandler (async (req,res)=>{
-    const users = await User.find().select('-password').lean() // no reason to send the password back to the client 
-    if(!users?.length){
-        return res.status(400).json({message:'no users found'})
-
-    }
-    res.json(users)
-    
+//Admin access
+const getallUsers = asyncHandler(async (req, res) => {
+  // ✅ Use the user and roles from the verified token
+  const username = req.user;
+  const roles = req.roles;
 
 
-})
+
+  if (!username) {
+    return res.status(400).json({ message: 'User not found in token' });
+  }
+
+  // ✅ Check if the authenticated user has admin privileges
+  if (!roles?.includes('admin')) {
+    return res.status(403).json({ message: 'Unauthorized - Admin access only' });
+  }
+
+  // ✅ Fetch all users
+  const users = await User.find().select('-password').lean();
+
+  if (!users?.length) {
+    return res.status(404).json({ message: 'No users found' });
+  }
+
+  res.json(users);
+});
+
+
 //@desc Create new user
 //@route Post/users
-//@access Private
+//@access Public
+
 const createNewUser =asyncHandler (async (req,res)=>{
     const{username,password,roles}=req.body
     // Confirm data 
@@ -75,6 +94,7 @@ const createNewUser =asyncHandler (async (req,res)=>{
 //@desc Update a user
 //@route PATCH/users
 //@access Private
+// only user
 const updateuser =asyncHandler (async (req,res)=>{
     const{username,roles,active,password}=req.body 
     const{id}= req.params
@@ -122,22 +142,28 @@ const getUser  = asyncHandler(async (req, res) => {
 //@desc Delete a user
 //@route Delete/users
 //@access Private
+// Admin and user 
 const deleteUser = asyncHandler(async (req, res) => {
+    const username = req.user
+    const roles = req.roles
     const { id } = req.body
 
+    if (!username) {
+    return res.status(400).json({ message: 'User not found in token' });
+  }
 
-    // Confirm data
-    if (!id) {
-        return res.status(400).json({ message: 'User ID Required' })
-    }
+  // ✅ Check if the authenticated user has admin privileges
+  if (!roles?.includes('admin')) {
+    return res.status(403).json({ message: 'Unauthorized - Admin access only' });
+  }
 
-    // Does the user still have assigned notes?
-    const note = await Note.find({ user: id }).lean().exec()
-    if (note) {
-        const deleted = await Note.deleteMany({user:id}) // edit this line of code
+    // Does the user still have assigned posts?
+    const post = await Post.find({ user: id }).lean().exec()
+    if (post) {
+        const deleted = await Post.deleteMany({user:id}) // edit this line of code
         //confirm the deleting 
         if(!deleted){
-            return res.status(400).json({message:"the notes can't be deleted "})
+            return res.status(400).json({message:"the posts can't be deleted "})
         }
         
     }
