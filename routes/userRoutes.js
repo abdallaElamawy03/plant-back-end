@@ -7,7 +7,7 @@ const loginLimiter = require('../middleware/loginLimiter')
 router.use(loginLimiter)
 // router.use(verifyjwt)
 router.route('/')
-    .get(verifyjwt,users.getallUsers)
+    .get(users.getallUsers)
     .post(users.createNewUser)
     .delete(verifyjwt,users.deleteUser)
     // .patch(users.updateuser)//update method
