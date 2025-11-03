@@ -4,7 +4,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server",
-    "dev": "concurrently \"nodemon server\" \"cd ../Front-end && npm start\""
+    "dev": "concurrently \"nodemon server\" \"cd ../front-end && npm start\""
   },
   "keywords": [],
   "author": "",
@@ -22,6 +22,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.19.2",
     "mongoose-sequence": "^6.0.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "update": "^0.7.4",
     "uuid": "^11.1.0"
   },
