@@ -38,9 +38,9 @@ const getallUsers = asyncHandler(async (req, res) => {
 //@access Public
 
 const createNewUser = asyncHandler(async (req, res) => {
-  const { username, password, roles } = req.body;
+  const { username, password,phonenumber,country,city,roles } = req.body;
   // Confirm data
-  if (!username || !password) {
+  if (!username || !password,!phonenumber) {
     return res.status(400).json({ message: "all fields are required " });
   }
 
@@ -57,14 +57,14 @@ const createNewUser = asyncHandler(async (req, res) => {
   const hashPwd = await bcrypt.hash(password, 10); // 10 is the salting
   const userObject =
     !Array.isArray(roles) || !roles.length
-      ? { username, password: hashPwd }
-      : { username, password: hashPwd, roles };
+      ? { username, password: hashPwd,phonenumber:phonenumber,country:country,city:city }
+      : { username, password: hashPwd, roles ,phonenumber:phonenumber,country:country,city:city};
 
   //Create and store the new user
   const user = await User.create(userObject);
 
-  if (!user) {
-    res.status(400).json({ message: `new user ${username} created` });
+if (!user) {
+    res.status(400).json({ message: `sorry , not created` });
   }
   const accessToken = jwt.sign(
     {
@@ -87,18 +87,18 @@ const createNewUser = asyncHandler(async (req, res) => {
     sameSite: "None",
     maxAge: 7 * 24 * 60 * 60 * 1000,
   });
-  res.json({ accessToken });
+  res.json({ accessToken,userObject });
 });
 //@desc Update a user
 //@route PATCH/users
 //@access Private
 // only user
 const updateuser = asyncHandler(async (req, res) => {
-  const { username, roles, active, password } = req.body;
+  const { username, active, password ,phonenumber,country,city } = req.body;
   const { id } = req.params;
 
   // Confirm data
-  if (!id || !username) {
+  if (!id || !username,!phonenumber,country,city) {
     return res.status(400).json({ message: "All field are required" });
   }
   const user = await User.findById(id).exec();
@@ -115,13 +115,15 @@ const updateuser = asyncHandler(async (req, res) => {
     return res.status(409).json({ message: "Duplicate username" });
   }
   user.username = username;
-  user.roles = roles;
   user.active = active;
+  user.phonenumber=phonenumber
+  user.country=country
+  user.city=city
   if (password) {
     //Hashpassword
     user.password = await bcrypt.hash(password, 10); //salt rounds
   }
-  const updatedUser = await user.save();
+  const updatedUser = await user.save();xsa
   res.json({ message: `${updatedUser.username} updated ` });
 });
 const getUser = asyncHandler(async (req, res) => {
