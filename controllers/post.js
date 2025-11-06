@@ -1,4 +1,3 @@
-const { addMinutes } = require('date-fns/addMinutes');
 const posts = require('../models/posts');
 const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
@@ -32,9 +31,10 @@ const allposts = asyncHandler(async (req, res) => {
 // @ only admin
 // v1.0
 const deletepost_a = asyncHandler(async (req, res) => {
-  const username = req.user; // from middleware
-  const roles = req.roles;   // assuming middleware attaches roles array
-  const { id } = req.params; // post ID from URL
+  const username = req.user; 
+  const roles = req.roles;   
+  const { id } = req.params; 
+  
 
   // Validate inputs
   if (!id) return res.status(400).json({ message: "Post ID is required" });
