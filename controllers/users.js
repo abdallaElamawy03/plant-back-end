@@ -40,7 +40,7 @@ const getallUsers = asyncHandler(async (req, res) => {
 const createNewUser = asyncHandler(async (req, res) => {
   const { username, password,phonenumber,country,city,roles } = req.body;
   // Confirm data
-  if (!username || !password,!phonenumber) {
+  if (!username || !password|| !phonenumber) {
     return res.status(400).json({ message: "all fields are required " });
   }
 
@@ -98,7 +98,7 @@ const updateuser = asyncHandler(async (req, res) => {
   const { id } = req.params;
 
   // Confirm data
-  if (!id || !username,!phonenumber,country,city) {
+  if (!id || !username,!phonenumber,!country,!city) {
     return res.status(400).json({ message: "All field are required" });
   }
   const user = await User.findById(id).exec();
@@ -123,7 +123,7 @@ const updateuser = asyncHandler(async (req, res) => {
     //Hashpassword
     user.password = await bcrypt.hash(password, 10); //salt rounds
   }
-  const updatedUser = await user.save();xsa
+  const updatedUser = await user.save();
   res.json({ message: `${updatedUser.username} updated ` });
 });
 const getUser = asyncHandler(async (req, res) => {

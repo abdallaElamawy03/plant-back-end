@@ -7,25 +7,24 @@ const asyncHandler = require("express-async-handler");
 // @ access private to Admin 
 
 const allposts = asyncHandler(async (req, res) => {
-  const username = req.user;
-  const roles = req.roles;
+  try {
+    const allPosts = await posts.find({})
+    .populate({
+      path: "user",
+      select: "username city ",
+      
+    })
+    .lean();
 
-  if (!username)
-    return res.status(400).json({ message: "Username not found" });
+    if (!allPosts || allPosts.length === 0) {
+      return res.status(404).json({ message: "No posts found" });
+    }
 
-  if (!roles?.includes("admin")) {
-    return res
-      .status(403)
-      .json({ message: "Unauthorized - Admin access only" });
+    res.status(200).json(allPosts);
+  } catch (error) {
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Server error while fetching posts" });
   }
-
-  // use your Post model here (replace `Post` with actual model name)
-  const allPosts = await posts.find({}).lean();
-
-  if (!allPosts || allPosts.length === 0)
-    return res.status(404).json({ message: "No posts found" });
-
-  return res.status(200).json(allPosts);
 });
 // @deletepost
 // @ only admin

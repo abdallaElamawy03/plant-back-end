@@ -13,7 +13,7 @@ const verifyJWT = (req, res, next) => {
     // Verify token
     jwt.verify(
         token,
-        process?.env?.ACCESS_TOKEN_SECRET,
+        process?.env?.ACCESS_TOKEN_SECRET||process?.env?.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
             // Handle token verification errors
             if (err) {
