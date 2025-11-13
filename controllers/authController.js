@@ -52,32 +52,48 @@ const login = asyncHandler(async (req, res) => {
 // @desc Refresh
 // @route Get /auth/refresh
 // @access Public - because access token has expires
-const refresh = (req, res) => {
+
+const refresh = asyncHandler(async (req, res) => {
   const cookies = req.cookies;
-  if (!cookies?.jwt) return res.status(401).json({ message: "Unauthorized" });
+  if (!cookies?.jwt) {
+    return res.status(401).json({ message: "Unauthorized - No refresh token" });
+  }
+
   const refreshToken = cookies.jwt;
-  jwt.verify(
-    refreshToken,
-    process.env.REFRESH_TOKEN_SECRET,
-    asyncHandler(async (err, decoded) => {
-      if (err) return res.status(403).json({ message: "Forbidden" });
-      const foundUser = await User.findOne({ username: decoded.username });
-      const roles = Object.values(foundUser.roles);
-      if (!foundUser) return res.status(401).json({ message: "Unauthorized" });
-      const accessToken = jwt.sign(
-        {
-          userInfo: {
-            username: foundUser.username,
-            roles: foundUser.roles,
-          },
+
+  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
+    if (err) {
+      return res.status(403).json({ message: "Forbidden - Invalid or expired refresh token" });
+    }
+
+    const foundUser = await User.findOne({ username: decoded.username }).exec();
+    if (!foundUser) {
+      return res.status(401).json({ message: "Unauthorized - User not found" });
+    }
+
+    const roles = Array.isArray(foundUser.roles)
+      ? foundUser.roles
+      : Object.values(foundUser.roles);
+
+    // Generate new access token
+    const accessToken = jwt.sign(
+      {
+        UserInfo: {
+          username: foundUser.username,
+          roles: roles,
         },
-        process.env.ACCESS_TOKEN_SECRET,
-        { expiresIn: "30m" }
-      );
-      res.json({ roles, accessToken, username: foundUser.username });
-    })
-  );
-};
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "30m" }
+    );
+
+    res.json({
+      roles,
+      accessToken,
+      username: foundUser.username,
+    });
+  });
+});
 
 // @desc Logout
 // @route POST /auth/Logout

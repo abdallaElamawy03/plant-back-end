@@ -4,15 +4,15 @@ const router = express.Router();
 const users = require("../controllers/users");
 const verifyjwt = require("../middleware/verifyJwt");
 const loginLimiter = require("../middleware/loginLimiter");
+const verifyRefreshToken = require("../middleware/verifyrefreshtoken");
 router.use(loginLimiter);
 // router.use(verifyjwt)
 router.route('/')
-    .get(users.getallUsers)
+    .get(verifyjwt,users.getallUsers)
     .post(users.createNewUser)
     .delete(verifyjwt,users.deleteUser)
     // .patch(users.updateuser)//update method
 router.route('/:id').patch(users.updateuser).get(users.getUser)
-
 /**
  * @swagger
  * /users:
@@ -97,11 +97,7 @@ router.route('/:id').patch(users.updateuser).get(users.getUser)
  *       404:
  *         $ref: '#/components/responses/NotFoundError'
  */
-router
-  .route("/")
-  .get(verifyjwt, users.getallUsers)
-  .post(users.createNewUser)
-  .delete(verifyjwt, users.deleteUser);
+
 // .patch(users.updateuser)//update method
 
 /**

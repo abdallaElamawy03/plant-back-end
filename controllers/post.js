@@ -4,26 +4,26 @@ const asyncHandler = require("express-async-handler");
 
 // get all posts 
 // get / All 
-// @ access private to Admin 
+// @ access public
 
 const allposts = asyncHandler(async (req, res) => {
   try {
     const allPosts = await posts.find({})
-    .populate({
-      path: "user",
-      select: "username city ",
-      
-    })
-    .lean();
+      .populate({
+        path: 'user',
+        select: 'username city',
+      })
+      .sort({ post_date: -1 }) // ✅ Sort by post_date descending (newest first)
+      .lean();
 
     if (!allPosts || allPosts.length === 0) {
-      return res.status(404).json({ message: "No posts found" });
+      return res.status(404).json({ message: 'No posts found' });
     }
 
     res.status(200).json(allPosts);
   } catch (error) {
-    console.error("Error fetching posts:", error);
-    res.status(500).json({ message: "Server error while fetching posts" });
+    console.error('Error fetching posts:', error);
+    res.status(500).json({ message: 'Server error while fetching posts' });
   }
 });
 // @deletepost
