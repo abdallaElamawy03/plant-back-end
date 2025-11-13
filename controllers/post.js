@@ -46,11 +46,11 @@ const deletepost_a = asyncHandler(async (req, res) => {
   if (!admin) return res.status(404).json({ message: "Admin user not found" });
 
   // Find the post
-  const post = await Post.findById(id).exec();
+  const post = await posts.findById(id).exec();
   if (!post) return res.status(404).json({ message: "Post not found" });
 
   // Delete the post
-  await Post.findByIdAndDelete(id).exec();
+  await posts.findByIdAndDelete(id).exec();
 
   res.status(200).json({
     message: `Post with ID ${id} deleted successfully by admin ${username}`,

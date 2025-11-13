@@ -7,7 +7,7 @@ const announceSchema = new mongoose.Schema({
     },
  announcedate:{
     type:Date,
-    default:new Date()
+    default:Date.now
  },
  text:{
     type:String,
