@@ -35,8 +35,10 @@ app.use(
 app.use("/", require("./routes/root"));
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/users", require("./routes/userRoutes"));
-app.use('/post',require('./routes/postroutes'))
-app.use('/announce',require('./routes/announceRoutes'))
+app.use("/post", require("./routes/postroutes"));
+app.use("/announce", require("./routes/announceRoutes"));
+app.use("/stats", require("./routes/statsRoutes"));
+app.use("/activity", require("./routes/activityRoutes"));
 
 app.all("*", (req, res) => {
   res.status(404);

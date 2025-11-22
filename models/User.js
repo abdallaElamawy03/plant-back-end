@@ -16,18 +16,29 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
   },
-   phonenumber:{
-    type:String,
-    default:"123"
- },
- country:{
-  type:String,
-  default:"country"
- },
- city:{
-  type:String,
-  default:"city"
-  
- }
+  phonenumber: {
+    type: String,
+    default: "123",
+  },
+  country: {
+    type: String,
+    default: "country",
+  },
+  city: {
+    type: String,
+    default: "city",
+  },
+  location: {
+    type: String,
+    default: "",
+  },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
+  lastLogin: {
+    type: Date,
+    default: Date.now,
+  },
 });
 module.exports = mongoose.model("User", userSchema);

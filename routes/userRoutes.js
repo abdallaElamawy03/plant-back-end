@@ -6,12 +6,14 @@ const verifyjwt = require("../middleware/verifyJwt");
 const loginLimiter = require("../middleware/loginLimiter");
 router.use(loginLimiter);
 // router.use(verifyjwt)
-router.route('/')
-    .get(verifyjwt,users.getallUsers)
-    .post(users.createNewUser)
-    .delete(verifyjwt,users.deleteUser)
-    // .patch(users.updateuser)//update method
-router.route('/:id').patch(users.updateuser).get(users.getUser)
+router
+  .route("/")
+  .get(verifyjwt, users.getallUsers)
+  .post(users.createNewUser)
+  .delete(verifyjwt, users.deleteUser);
+// .patch(users.updateuser)//update method
+router.route("/profile").get(verifyjwt, users.getUserProfile);
+router.route("/:id").patch(users.updateuser).get(users.getUser);
 /**
  * @swagger
  * /users:

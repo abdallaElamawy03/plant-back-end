@@ -23,6 +23,10 @@ const login = asyncHandler(async (req, res) => {
     res.status(400).json({ message: "there is no roles found" });
   }
 
+  // Update last login time
+  foundUser.lastLogin = new Date();
+  await foundUser.save();
+
   const accessToken = jwt.sign(
     {
       UserInfo: {
@@ -61,38 +65,48 @@ const refresh = asyncHandler(async (req, res) => {
 
   const refreshToken = cookies.jwt;
 
-  jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, async (err, decoded) => {
-    if (err) {
-      return res.status(403).json({ message: "Forbidden - Invalid or expired refresh token" });
-    }
+  jwt.verify(
+    refreshToken,
+    process.env.REFRESH_TOKEN_SECRET,
+    async (err, decoded) => {
+      if (err) {
+        return res
+          .status(403)
+          .json({ message: "Forbidden - Invalid or expired refresh token" });
+      }
 
-    const foundUser = await User.findOne({ username: decoded.username }).exec();
-    if (!foundUser) {
-      return res.status(401).json({ message: "Unauthorized - User not found" });
-    }
+      const foundUser = await User.findOne({
+        username: decoded.username,
+      }).exec();
+      if (!foundUser) {
+        return res
+          .status(401)
+          .json({ message: "Unauthorized - User not found" });
+      }
 
-    const roles = Array.isArray(foundUser.roles)
-      ? foundUser.roles
-      : Object.values(foundUser.roles);
+      const roles = Array.isArray(foundUser.roles)
+        ? foundUser.roles
+        : Object.values(foundUser.roles);
 
-    // Generate new access token
-    const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          username: foundUser.username,
-          roles: roles,
+      // Generate new access token
+      const accessToken = jwt.sign(
+        {
+          UserInfo: {
+            username: foundUser.username,
+            roles: roles,
+          },
         },
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "30m" }
-    );
+        process.env.ACCESS_TOKEN_SECRET,
+        { expiresIn: "30m" }
+      );
 
-    res.json({
-      roles,
-      accessToken,
-      username: foundUser.username,
-    });
-  });
+      res.json({
+        roles,
+        accessToken,
+        username: foundUser.username,
+      });
+    }
+  );
 });
 
 // @desc Logout

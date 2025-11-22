@@ -1,44 +1,51 @@
-const posts = require('../models/posts');
+const posts = require("../models/posts");
 const User = require("../models/User");
+const Activity = require("../models/Activity");
 const asyncHandler = require("express-async-handler");
 
-// get all posts 
-// get / All 
+// get all posts
+// get / All
 // @ access public
 
 const allposts = asyncHandler(async (req, res) => {
   try {
-    const allPosts = await posts.find({})
+    const allPosts = await posts
+      .find({})
       .populate({
-        path: 'user',
-        select: 'username city',
+        path: "user",
+        select: "username city",
+      })
+      .populate({
+        path: "comments.user",
+        select: "username",
       })
       .sort({ post_date: -1 }) // ✅ Sort by post_date descending (newest first)
       .lean();
 
     if (!allPosts || allPosts.length === 0) {
-      return res.status(404).json({ message: 'No posts found' });
+      return res.status(404).json({ message: "No posts found" });
     }
 
     res.status(200).json(allPosts);
   } catch (error) {
-    console.error('Error fetching posts:', error);
-    res.status(500).json({ message: 'Server error while fetching posts' });
+    console.error("Error fetching posts:", error);
+    res.status(500).json({ message: "Server error while fetching posts" });
   }
 });
 // @deletepost
 // @ only admin
 // v1.0
 const deletepost_a = asyncHandler(async (req, res) => {
-  const username = req.user; 
-  const roles = req.roles;   
-  const { id } = req.params; 
-  
+  const username = req.user;
+  const roles = req.roles;
+  const { id } = req.params;
 
   // Validate inputs
   if (!id) return res.status(400).json({ message: "Post ID is required" });
   if (!roles || !roles.includes("admin")) {
-    return res.status(403).json({ message: "Unauthorized - Admin access only" });
+    return res
+      .status(403)
+      .json({ message: "Unauthorized - Admin access only" });
   }
 
   // Check if user exists (optional but safer)
@@ -57,10 +64,8 @@ const deletepost_a = asyncHandler(async (req, res) => {
   });
 });
 
-
-//@desc add post 
-//@ any user 
-
+//@desc add post
+//@ any user
 
 const addpost = asyncHandler(async (req, res) => {
   const username = req.user; // should come from auth middleware
@@ -86,6 +91,17 @@ const addpost = asyncHandler(async (req, res) => {
   const newPost = await posts.create({
     title,
     user: user._id, // use _id, not id
+  });
+
+  // Create activity record
+  await Activity.create({
+    user: user._id,
+    type: "community_post",
+    description: `Posted: ${title.substring(0, 50)}${
+      title.length > 50 ? "..." : ""
+    }`,
+    link: `/community/${newPost._id}`,
+    relatedPost: newPost._id,
   });
 
   //  Send response
@@ -123,7 +139,9 @@ const deletepost = asyncHandler(async (req, res) => {
 
   //  Check authorization — user can only delete their own posts
   if (post.user.toString() !== user._id.toString()) {
-    return res.status(403).json({ message: "Unauthorized to delete this post" });
+    return res
+      .status(403)
+      .json({ message: "Unauthorized to delete this post" });
   }
 
   //  Delete the post
@@ -131,7 +149,7 @@ const deletepost = asyncHandler(async (req, res) => {
 
   res.status(200).json({ message: "Post deleted successfully" });
 });
-//@edit post 
+//@edit post
 //@only owned users to the post
 //@v1.0
 
@@ -142,8 +160,7 @@ const editpost = asyncHandler(async (req, res) => {
 
   // Validate inputs
   if (!id) return res.status(400).json({ message: "Post ID is required" });
-  if (!title)
-    return res.status(400).json({ message: "Nothing to update" });
+  if (!title) return res.status(400).json({ message: "Nothing to update" });
 
   // Find the logged-in user first
   const user = await User.findOne({ username }).exec();
@@ -181,7 +198,8 @@ const addcomment = asyncHandler(async (req, res) => {
 
   // Validate inputs
   if (!id) return res.status(400).json({ message: "Post ID is required" });
-  if (!text) return res.status(400).json({ message: "Comment text is required" });
+  if (!text)
+    return res.status(400).json({ message: "Comment text is required" });
 
   // Find the logged-in user
   const user = await User.findOne({ username }).exec();
@@ -204,21 +222,32 @@ const addcomment = asyncHandler(async (req, res) => {
   // Save updated post
   const updatedPost = await post.save();
 
+  // Create activity record
+  await Activity.create({
+    user: user._id,
+    type: "comment",
+    description: `Commented on a post`,
+    link: `/community/${id}`,
+    relatedPost: id,
+  });
+
   res.status(201).json({
     message: "Comment added successfully",
     comments: updatedPost.comments,
   });
 });
 // @Delete comment
-// @owned user only 
+// @owned user only
 // @v1.0
 const deletecomment = asyncHandler(async (req, res) => {
-  const username = req.user; 
+  const username = req.user;
   const { postId, commentId } = req.params;
 
   // Validate input
   if (!postId || !commentId)
-    return res.status(400).json({ message: "Post ID and Comment ID are required" });
+    return res
+      .status(400)
+      .json({ message: "Post ID and Comment ID are required" });
 
   // Find the logged-in user
   const user = await User.findOne({ username }).exec();
@@ -239,7 +268,7 @@ const deletecomment = asyncHandler(async (req, res) => {
     });
   }
 
-  comment.deleteOne(); 
+  comment.deleteOne();
 
   // Save the updated post
   await post.save();
@@ -250,21 +279,66 @@ const deletecomment = asyncHandler(async (req, res) => {
   });
 });
 
+// @desc Like/Unlike a post
+// @route POST /posts/:id/like
+// @access Private
+const likePost = asyncHandler(async (req, res) => {
+  const username = req.user;
+  const { id } = req.params;
 
+  if (!username) {
+    return res.status(400).json({ message: "User not found in token" });
+  }
 
+  if (!id) {
+    return res.status(400).json({ message: "Post ID is required" });
+  }
 
+  // Find the user
+  const user = await User.findOne({ username }).exec();
+  if (!user) {
+    return res.status(404).json({ message: "User not found" });
+  }
 
+  // Find the post
+  const post = await posts.findById(id).exec();
+  if (!post) {
+    return res.status(404).json({ message: "Post not found" });
+  }
 
+  // Check if user already liked the post
+  const likeIndex = post.likes.indexOf(user._id);
 
+  if (likeIndex > -1) {
+    // Unlike - remove user from likes array
+    post.likes.splice(likeIndex, 1);
+    await post.save();
 
-module.exports={
-    allposts,
-    addpost,
-    deletepost,
-    editpost,
-    addcomment,
-    deletecomment,
-    deletepost_a
+    return res.status(200).json({
+      message: "Post unliked successfully",
+      liked: false,
+      likesCount: post.likes.length,
+    });
+  } else {
+    // Like - add user to likes array
+    post.likes.push(user._id);
+    await post.save();
 
+    return res.status(200).json({
+      message: "Post liked successfully",
+      liked: true,
+      likesCount: post.likes.length,
+    });
+  }
+});
 
-}
+module.exports = {
+  allposts,
+  addpost,
+  deletepost,
+  editpost,
+  addcomment,
+  deletecomment,
+  deletepost_a,
+  likePost,
+};
