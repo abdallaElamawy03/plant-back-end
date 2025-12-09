@@ -10,7 +10,6 @@ const cors = require("cors");
 const PORT = process.env.PORT || 3500;
 const connectDB = require("./config/dbConn");
 const mongoose = require("mongoose");
-const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 app.use(express.json());
 
@@ -21,17 +20,6 @@ app.use(cors(corsOptions));
 
 console.log(process.env.NODE_ENV);
 
-// Swagger API Documentation
-app.use(
-  "/api-docs",
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, {
-    explorer: true,
-    customCss: ".swagger-ui .topbar { display: none }",
-    customSiteTitle: "Plant Backend API Documentation",
-  })
-);
-
 app.use("/", require("./routes/root"));
 app.use("/auth", require("./routes/authRoutes"));
 app.use("/users", require("./routes/userRoutes"));
@@ -39,6 +27,8 @@ app.use("/post", require("./routes/postroutes"));
 app.use("/announce", require("./routes/announceRoutes"));
 app.use("/stats", require("./routes/statsRoutes"));
 app.use("/activity", require("./routes/activityRoutes"));
+app.use("/ai/soil-analysis", require("./routes/soilAnalysisRoutes"));
+app.use("/ai/plant-diagnosis", require("./routes/plantDiagnosisRoutes"));
 
 app.all("*", (req, res) => {
   res.status(404);
