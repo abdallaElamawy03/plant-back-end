@@ -4,7 +4,7 @@ const stats = require("../controllers/stats");
 const verifyjwt = require("../middleware/verifyJwt");
 const loginLimiter = require("../middleware/loginLimiter");
 
-router.use(loginLimiter);
+// router.use(loginLimiter);
 router.use(verifyjwt);
 
 router.route("/dashboard").get(stats.getDashboardStats);

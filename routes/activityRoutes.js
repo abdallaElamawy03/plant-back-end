@@ -6,7 +6,7 @@ const Activity = require("../models/Activity");
 const User = require("../models/User");
 const asyncHandler = require("express-async-handler");
 
-router.use(loginLimiter);
+// router.use(loginLimiter);
 router.use(verifyjwt);
 
 // @desc Track user activity

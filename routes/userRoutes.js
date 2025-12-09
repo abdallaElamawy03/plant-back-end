@@ -4,7 +4,7 @@ const router = express.Router();
 const users = require("../controllers/users");
 const verifyjwt = require("../middleware/verifyJwt");
 const loginLimiter = require("../middleware/loginLimiter");
-router.use(loginLimiter);
+// router.use(loginLimiter);
 // router.use(verifyjwt)
 router
   .route("/")
