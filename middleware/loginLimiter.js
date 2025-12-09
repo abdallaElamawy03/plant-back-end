@@ -2,7 +2,7 @@ const rateLimit = require('express-rate-limit')
 const {logEvents} = require("./logger")
 const loginLimiter = rateLimit({
     windowsMs:60*1000,
-    max:10,
+    max:100,
     message:{
         message : `too many login attempts from this IP , please try again after a 60 second pause`
     },
